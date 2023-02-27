@@ -1,0 +1,150 @@
+# In honor of Kobe Bryant
+
+# Identify the best combination of coaching strategies to guard Kobe Bryant using probability 
+
+# Import packages
+import random
+import matplotlib.pyplot as plt
+
+# Change randomization seed for a different game
+random.seed(538)
+
+# Variables
+miss_weight = 30
+dish_weight = 50
+teammate_miss_weight = 60
+foul_weight = 100
+turnover_weight = 5
+drive_weight = 70
+
+# A function for strategy #1
+def Help(response):
+    global miss_weight, dish_weight, teammate_miss_weight
+    if response == "Double":
+        miss_weight = miss_weight + 50
+        dish_weight = dish_weight + 150
+        teammate_miss_weight = teammate_miss_weight - 20
+    elif response == "No Double":
+        miss_weight = miss_weight
+        dish_weight = dish_weight
+        teammate_miss_weight = teammate_miss_weight
+
+# Select "Double" or "No Double"
+Help("No Double")
+
+# A function for strategy #2
+def Jump(decide):
+   global miss_weight, foul_weight
+   if decide == "Contest":
+        miss_weight = miss_weight + 30
+        foul_weight = foul_weight + 80
+   elif decide == "Stay Vertical":
+        miss_weight = miss_weight
+        foul_weight = foul_weight
+
+# Select "Contest" or "Stay Vertical"
+Jump("Stay Vertical")
+
+# A function for strategy #3
+def Hand(attempt):
+    global turnover_weight, miss_weight, foul_weight, drive_weight
+    if attempt == "Go for a steal":
+        turnover_weight = turnover_weight + 70
+        miss_weight = miss_weight + 5
+        foul_weight = foul_weight + 85
+        drive_weight = drive_weight + 100
+    elif attempt == "Stay Wide":
+        turnover_weight = turnover_weight
+        miss_weight = miss_weight
+        foul_weight = foul_weight
+        drive_weight = drive_weight 
+        
+# Select "Go for a steal" or "Stay Wide"
+Hand("Stay Wide")
+
+# Accuracy
+three = random.choices(["Three: Score", "Three: Miss", "Three: Pumpfake"], weights=(80, miss_weight, 150))
+mid = random.choices(["Mid Range: Score", "Mid Range: Miss", "Mid: Pumpfake"], weights=(90, miss_weight, 180))
+drive = random.choices(["Drive: Score", "Drive: Miss", "Drive: Pumpfake"], weights=(80, miss_weight, 180))
+dish = random.choices(["Pass: Assist", "Pass: No Assist", "Pass: Turnover"], weights=(60, teammate_miss_weight, 20)) 
+
+# Tendency
+def Possession(x):
+    global three, mid, drive, dish, drive_weight, dish_weight, turnover_weight, score, points, miss_weight, teammate_miss_weight, foul_weight
+    score = [0]
+    points = score[-1]
+    assist = [0]
+    dimes = assist[-1]
+
+    for i in range(x):
+        decision = random.choices([three, mid, drive, dish, "Turnover"], weights=(30, 100, drive_weight, dish_weight, turnover_weight))
+
+        if decision == [three] and three == ["Three: Score"]:
+            points = points + 3
+        if decision == [mid] and mid == ["Mid Range: Score"]:
+            points = points + 2
+        if decision == [drive] and drive == ["Drive: Score"]:
+            points = points + 2
+        if decision == [three] or decision ==[mid] or decision == [drive]:
+            foul = random.choices(["Foul", "No Foul"], weights=(foul_weight, 400))
+            if foul == ["Foul"] and three == ["Three: Score"] and decision == [three]:
+                shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                if shoot == ["Free Throw: Score"]:
+                    points = points + 1
+            if foul == ["Foul"] and three == ["Three: Miss"] and decision == [three]:
+                for i in range(3):
+                    shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                    if shoot == ["Free Throw: Score"]:
+                        points = points + 1 
+            if foul == ["Foul"] and three == ["Three: Pumpfake"] and decision == [three]:
+                for i in range(3):
+                    shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                    if shoot == ["Free Throw: Score"]:
+                        points = points + 1 
+            if foul == ["Foul"] and mid == ["Mid Range: Score"] and decision == [mid]:
+                shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                if shoot == ["Free Throw: Score"]:
+                    points = points + 1
+            if foul == ["Foul"] and mid == ["Mid Range: Miss"] and decision == [mid]:
+                for i in range(2):
+                    shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                    if shoot == ["Free Throw: Score"]:
+                        points = points + 1 
+            if foul == ["Foul"] and mid == ["Mid: Pumpfake"] and decision == [mid]:
+                for i in range(2):
+                    shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                    if shoot == ["Free Throw: Score"]:
+                        points = points + 1 
+            if foul == ["Foul"] and drive == ["Drive: Score"] and decision == [drive]:
+                shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                if shoot == ["Free Throw: Score"]:
+                    points = points + 1 
+            if foul == ["Foul"] and drive == ["Drive: Miss"] and decision == [drive]:
+                for i in range(2):
+                    shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                    if shoot == ["Free Throw: Score"]:
+                        points = points + 1 
+            if foul == ["Foul"] and drive == ["Drive: Pumpfake"] and decision == [drive]:
+                for i in range(2):
+                    shoot = random.choices(["Free Throw: Score", "Free Throw: Miss"], weights=(83.7,16.3))
+                    if shoot == ["Free Throw: Score"]:
+                        points = points + 1        
+        if decision == [dish] and dish == ["Pass: Assist"]:
+            dimes = dimes + 1
+        else:
+            points = points
+            dimes = dimes
+        score.append(points)
+        assist.append(dimes)
+    print(score)
+    print(assist) 
+    plt.plot(score, label = "Points")
+    plt.plot(assist, label = "Assist")
+    plt.xlabel("Possession")
+    plt.legend()
+    plt.title("Kobe's Stats")
+    plt.show()
+
+
+# Run this many possesions
+Possession(30)
